@@ -1,0 +1,28 @@
+# Python dependencies for the `moose` conda environment.
+# MOOSE / aragonite-opt itself is NOT a pip package -- built separately.
+#
+# meshio is used by:
+#   - generate_odsfe_inputs.py (reads mesh bounds from .msh)
+#
+# netCDF4 is used by:
+#   - extract_czm_boundaries.py (reads the split Exodus (.e) file directly
+#     via netCDF4.Dataset to find BlockX_BlockY interface sidesets --
+#     Exodus is netCDF-based, and meshio's Exodus support is unreliable
+#     for this pipeline's purposes; see README troubleshooting section).
+#     NOTE: this dependency is inferred from a closely-related sibling
+#     script in the same pipeline family (extract_per_interface_stats_
+#     from_exodus.py, same author/lineage), not confirmed against
+#     extract_czm_boundaries.py's own source directly -- verify this
+#     matches what it actually imports.
+#
+# numpy is a standard dependency of netCDF4-based array handling.
+#
+# Versions are not pinned -- none have been separately verified/frozen
+#
+# netCDF4 requires libnetcdf (and, for HDF5-backed/large-model Exodus
+# files -- see write_hdf5 in the README -- libhdf5) to be available at
+# build/link time. If `pip install netCDF4` fails to build, install via
+# conda-forge instead: `conda install -c conda-forge netcdf4`.
+meshio
+netCDF4
+numpy

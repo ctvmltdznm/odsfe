@@ -1,0 +1,11 @@
+# Python dependencies for the `neper` conda environment.
+# Neper itself is NOT a pip package -- install separately, see
+# https://neper.info/ (this pipeline was built/tested against Neper 4.10.2).
+# or 'conda create -n neper -c conda-forge neper'
+# 
+# meshio is used by:
+#   - generate_odsfe_rve.sh's own .msh -> .vtu conversion step
+#   - make_mesh_prep.py (reads actual mesh bounds to auto-build mesh_prep_<config>.i)
+#
+# Versions are not pinned -- none have been separately verified/frozen
+meshio
