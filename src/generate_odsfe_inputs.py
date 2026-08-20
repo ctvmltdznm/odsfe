@@ -95,8 +95,8 @@ print(f"Bounds: X[{xmin:.4f},{xmax:.4f}] Y[{ymin:.4f},{ymax:.4f}] Z[{zmin:.4f},{
 # fit -- see the model description doc, section 1.
 CZM = {
     'normal_strength':          20.0,
-    'shear_strength_s':         12.0,
-    'shear_strength_t':         12.0,
+    'shear_strength_s':         20.0,
+    'shear_strength_t':         20.0,
     'delta_0_normal':           2.8425461e-05,
     'delta_0_tangent':          7.1601097e-05,
     'mu':                       1.0,
@@ -163,7 +163,7 @@ content = f"""# {'='*70}
   [file]
     type = FileMeshGenerator
     file = '{Path(MESH_FILE).name}'
-    use_for_exodus_restart = true
+#    use_for_exodus_restart = true
   []
 {sidesets_block()}
   [break]
@@ -182,19 +182,19 @@ content = f"""# {'='*70}
     [QuasiStatic]
       [bulk]
         strain = SMALL
-        incremental = true
+        incremental = false
         add_variables = true
         volumetric_locking_correction = true
         generate_output = 'stress_xx stress_yy stress_zz stress_xy stress_xz stress_yz
                            strain_xx strain_yy strain_zz vonmises_stress'
       []
-      [CohesiveZone]
-        [grain_boundary]
-          boundary = '{interfaces}'
-          strain = SMALL
-          generate_output = 'traction_x traction_y traction_z normal_traction tangent_traction
-                             jump_x jump_y jump_z normal_jump tangent_jump'
-        []
+    []
+    [CohesiveZone]
+      [grain_boundary]
+        boundary = '{interfaces}'
+        strain = SMALL
+        generate_output = 'traction_x traction_y traction_z normal_traction tangent_traction
+                           jump_x jump_y jump_z normal_jump tangent_jump'
       []
     []
   []
@@ -259,10 +259,16 @@ content = f"""# {'='*70}
   # Peak of stress_xx_avg over the run = "applied stress at fracture".
   [stress_xx_avg]  type = ElementAverageValue  variable = stress_xx []
   [stress_xx_max]  type = ElementExtremeValue  variable = stress_xx []
+  [stress_yy_max]  type = ElementExtremeValue  variable = stress_yy []
+  [stress_zz_max]  type = ElementExtremeValue  variable = stress_zz []
+  [stress_xy_max]  type = ElementExtremeValue  variable = stress_xy []
+  [stress_xz_max]  type = ElementExtremeValue  variable = stress_xz []
+  [stress_yz_max]  type = ElementExtremeValue  variable = stress_yz []
   [strain_xx_avg]  type = ElementAverageValue  variable = strain_xx []
   [vonmises_avg]   type = ElementAverageValue  variable = vonmises_stress []
+  [vonmises_max]   type = ElementExtremeValue  variable = vonmises_stress []
 
-  # -- Interface (grain-boundary-normal) stress --------------------------------
+  # -- Interface stress: BOTH normal and tangent, avg and max -----------------
   [czm_avg_normal_traction]
     type = SideAverageValue  variable = normal_traction
     boundary = '{interfaces}'
@@ -275,12 +281,24 @@ content = f"""# {'='*70}
     type = SideAverageValue  variable = tangent_traction
     boundary = '{interfaces}'
   []
+  [czm_max_tangent_traction]
+    type = SideExtremeValue  variable = tangent_traction
+    boundary = '{interfaces}'
+  []
   [czm_avg_normal_jump]
     type = SideAverageValue  variable = normal_jump
     boundary = '{interfaces}'
   []
+  [czm_max_normal_jump]
+    type = SideExtremeValue  variable = normal_jump
+    boundary = '{interfaces}'
+  []
   [czm_avg_tangent_jump]
     type = SideAverageValue  variable = tangent_jump
+    boundary = '{interfaces}'
+  []
+  [czm_max_tangent_jump]
+    type = SideExtremeValue  variable = tangent_jump
     boundary = '{interfaces}'
   []
   [czm_avg_damage]
@@ -356,4 +374,3 @@ out_path.write_text(content)
 print(f"Written: {out_path}")
 print(f"\nVERIFY boundary names before trusting this file:")
 print(f"  moose-opt -i {out_path} --mesh-only")
-
