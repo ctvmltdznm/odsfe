@@ -85,7 +85,7 @@ SEED="${SEED:-$RANDOM}"  # NOTE: random per run unless SEED is preset --
                   # luck of the draw. Set SEED=<fixed_value> as an env var
                   # before calling this script for a reproducible
                   # tessellation instead.
-MORPHO_TOL="${MORPHO_TOL:-eps<1e-3||iter>=500}"
+MORPHO_TOL="${MORPHO_TOL:-eps<1e-3||iter>=15000}"
 
 case "$CONFIG" in
   isotropic)  ASPRATIO="1,1,1"       ;;
